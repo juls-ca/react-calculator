@@ -156,3 +156,5 @@ export const calculatorButtons = [
         value: 'Equal',
     }
 ]
+
+export default calculatorButtons;
