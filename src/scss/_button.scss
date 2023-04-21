@@ -1,0 +1,85 @@
+.buttons-wrapper {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.25rem;
+
+    .ac, .c {
+        grid-row: 2;
+        grid-column: span 2;
+        background: rgba(216, 0, 0, 0.5);
+
+    }
+
+    .square-root {
+        grid-column: 5/6;
+        grid-row: 2;
+    }
+
+    .sign {
+        grid-column: 4/5;
+        grid-row: 3;
+    }
+
+    .percent {
+        grid-column: 5/6;
+        grid-row: 3;
+    }
+
+    .divide {
+        grid-column: 4/5;
+        grid-row: 4;
+    }
+
+    .multiply {
+        grid-column: 5/6;
+        grid-row: 4;
+    }
+
+    .add {
+        grid-column: 5/6;
+        grid-row: 5;
+    }
+
+    .subtract{
+        grid-row: 5;
+        grid-column: 4/5;
+    }
+
+    .zero {
+        grid-column: span 2;
+        grid-row: 6;
+    }
+
+    .decimal {
+        grid-row: 6;
+    }
+
+    .equal {
+        grid-column: span 2;
+        background: rgba(0, 184, 49, 0.5);
+    }
+
+    :nth-child(n+3):nth-child(-n+7){
+        background: rgba(80, 80, 80, 0.5);
+    }
+
+    :nth-child(n+18):nth-child(-n+25){
+        background: rgba(232, 162, 0, 0.5);
+    }
+
+    button {
+        background: rgba(90, 90, 90, 0.2);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        color: #fafafa;
+        font-size: 1.5rem;
+
+        &:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+        }
+    }
+}
