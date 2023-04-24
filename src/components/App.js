@@ -40,7 +40,7 @@ function App() {
         if (prevBtnType === 'number' || prevBtnType === 'clear' || prevBtnType === 'enter'){
           // this ensures only the operand symbol is displayed
           setDisplay(btnText);
-
+          
           // for the calculation string, any unicodes need to be replaced by operator symbols that JavaScript will recognize
           if (btnText === '\u00f7'){
             btnText = '/';
@@ -51,7 +51,20 @@ function App() {
 
           // this adds the operand to the calculation string as the operand symbol JavaScript will recognize 
           setCalculation(`${calculation}${btnText}`);
+
+          // PERCENT & SQUARE ROOT --------------------------
+          if(btnText === '%'){
+            let result = new Function('return ' + `${display}/100`)();
+            setDisplay(result.toString());
+            setCalculation('');
+          }
+          else if (btnText === '\u221a'){
+            setDisplay(parseFloat((display ** 0.5).toFixed(8)));
+            setCalculation(`sqrt(${display})`);
+          }
         }
+
+  
         setPrevBtnType('operator');
         break;
 
