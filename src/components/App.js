@@ -22,76 +22,77 @@ function App() {
 
       // NUMBER -----------------------------------------------
       case 'number':
-        if (prevBtnType === 'operator'){
-          // this clears the display screen so that only the second number string is displayed
-          setDisplay(btnText);
-        }
-        else {
-          setDisplay(`${display}${btnText}`);
-        }
-
+        // clears the screen to only display the number string
+        setDisplay(prevBtnType === 'operator' ? `${btnText}` : `${display}${btnText}`);
         setCalculation(`${calculation}${btnText}`);
+        
         setPrevBtnType('number');
         break;
 
-
       // OPERATOR --------------------------------------------
       case 'operator':
-        if (prevBtnType === 'number' || prevBtnType === 'clear' || prevBtnType === 'enter'){
-          // this ensures only the operand symbol is displayed
-          setDisplay(btnText);
-          
-          // for the calculation string, any unicodes need to be replaced by operator symbols that JavaScript will recognize
-          if (btnText === '\u00f7'){
-            btnText = '/';
-          }
-          else if (btnText === '\u00d7'){
-            btnText = '*';
-          }
-
-          // this adds the operand to the calculation string as the operand symbol JavaScript will recognize 
-          setCalculation(`${calculation}${btnText}`);
-
-          // PERCENT & SQUARE ROOT --------------------------
-          if(btnText === '%'){
-            let result = new Function('return ' + `${display}/100`)();
-            setDisplay(result.toString());
-            setCalculation('');
-          }
-          else if (btnText === '\u221a'){
-            setDisplay(parseFloat((display ** 0.5).toFixed(8)));
-            setCalculation(`sqrt(${display})`);
-          }
-        }
-
+      // ensures operator is not followed by another operator
+      if (prevBtnType !== 'operator'){
+        // this ensures only the operand symbol is displayed
+        setDisplay(btnText);
   
-        setPrevBtnType('operator');
-        break;
-
+        // DIVIDE & MULTIPLY ------------------------------
+        // replace unicodes with JS-recognized symbols
+        if (btnText === '\u00f7'){
+          btnText = '/';
+        }
+        else if (btnText === '\u00d7'){
+          btnText = '*';
+        }
+        // adds recognized symbols to calc string
+        setCalculation(`${calculation}${btnText}`);
+  
+        // PERCENT & SQUARE ROOT --------------------------
+        if(btnText === '%'){
+          let result = new Function('return ' + `${display}/100`)();
+          result = parseFloat(result.toFixed(8));
+          setDisplay(result.toString());
+          setCalculation(result.toString());
+        }
+        else if (btnText === '\u221a'){
+          let result = new Function('return ' + `${display} ** 0.5`)();
+          result = parseFloat(result.toFixed(8));
+          setDisplay(result.toString());
+          setCalculation(result.toString());
+        }
+      }  
+        
+      setPrevBtnType('operator');
+      break;
 
       // CLEAR -----------------------------------------------
       case 'clear':
         if (btnValue === 'All Clear'){
           setDisplay('');
           setCalculation('');
-          setMemoryStr('');
         }
         else if (btnValue === 'Clear'){
           setCalculation(calculation.slice(0, -(display.length)));
           setDisplay('');
         }
+
         setPrevBtnType('clear');
         break;
 
-
       // ENTER -----------------------------------------------
       case 'enter':
-        let result = new Function('return ' + calculation)();
-        setDisplay(result.toString());
-        setCalculation(result.toString());
+        if(prevBtnType !== 'operator'){
+          let result = new Function('return ' + calculation)();
+          setDisplay(parseFloat(result.toFixed(8)).toString());
+          setCalculation(parseFloat(result.toFixed(8)).toString());
+        }
+        // Display 'Err' for incomplete calculation string
+        else {
+          setDisplay('Err');
+        }
+
         setPrevBtnType('enter');
         break;
-
 
       // MEMORY ----------------------------------------------
       case 'memory':
@@ -130,22 +131,29 @@ function App() {
         else if(btnValue === 'Memory Clear'){
           setMemoryStr('');
         }
+
         setPrevBtnType('memory');
         break;
 
       // DECIMAL ----------------------------------------------
       case 'decimal':
-        if(display === ''){
-          setDisplay('0.');
+        // prevents multiple decimal points in a number string
+        if(display.includes('.')){
+          setDisplay(display);
         }
-        setDisplay(`${display}.`);
-        setCalculation(`${calculation}.`);
+        else {
+          // screen displays 0 on empty display state
+          // on decimal click, assume user means '0.###'
+          setCalculation(display === '' ? '0.' : `${calculation}.`);
+          setDisplay(`${display}.`);
+        }
         setPrevBtnType('decimal');
         break;
 
       // SIGN -------------------------------------------------
       case 'sign':
-        // check if the first character is a negative sign. If it is, start string at the second character.
+        // check if the first character is a negative sign
+        // If it is, start string at the second character
         if (display[0] === '-'){
           setDisplay(display.substring(1));
           setCalculation(display.substring(1));
