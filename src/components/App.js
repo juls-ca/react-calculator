@@ -3,172 +3,196 @@ import Header from './Header';
 import Display from './Display';
 import Button from './Button';
 import Footer from './Footer';
-import calculatorButtons from '../globals/calculator-bonus-03-button-data.js';
+import calculatorButtons from '../globals/button-data.js';
 import '../scss/index.scss';
+import NotesForUse from './NotesForUse';
 
 
 function App() {
 
   // STATES
   const [display, setDisplay] = useState('');
-  const [calculation, setCalculation] = useState('');
-  const [prevBtnType, setPrevBtnType] = useState('');
+  const [calcStr, setCalcStr] = useState('');
   const [memoryStr, setMemoryStr] = useState('');
+  const [prevBtnType, setPrevBtnType] = useState('');
   
   // FUNCTIONS
   function handleClick(btnType, btnText, btnValue){
 
     switch(btnType){
-
-      // NUMBER -----------------------------------------------
       case 'number':
-        // clears the screen to only display the number string
-        setDisplay(prevBtnType === 'operator' ? `${btnText}` : `${display}${btnText}`);
-        setCalculation(`${calculation}${btnText}`);
-        
-        setPrevBtnType('number');
+        btnIsNumber(btnText);
         break;
-
-      // OPERATOR --------------------------------------------
       case 'operator':
-      // ensures operator is not followed by another operator
-      if (prevBtnType !== 'operator'){
-        // this ensures only the operand symbol is displayed
-        setDisplay(btnText);
-  
-        // DIVIDE & MULTIPLY ------------------------------
-        // replace unicodes with JS-recognized symbols
-        if (btnText === '\u00f7'){
-          btnText = '/';
-        }
-        else if (btnText === '\u00d7'){
-          btnText = '*';
-        }
-        // adds recognized symbols to calc string
-        setCalculation(`${calculation}${btnText}`);
-  
-        // PERCENT & SQUARE ROOT --------------------------
-        if(btnText === '%'){
-          let result = new Function('return ' + `${display}/100`)();
-          result = parseFloat(result.toFixed(8));
-          setDisplay(result.toString());
-          setCalculation(result.toString());
-        }
-        else if (btnText === '\u221a'){
-          let result = new Function('return ' + `${display} ** 0.5`)();
-          result = parseFloat(result.toFixed(8));
-          setDisplay(result.toString());
-          setCalculation(result.toString());
-        }
-      }  
-        
-      setPrevBtnType('operator');
-      break;
-
-      // CLEAR -----------------------------------------------
+        btnIsOperator(btnText);
+        break;
       case 'clear':
-        if (btnValue === 'All Clear'){
-          setDisplay('');
-          setCalculation('');
-        }
-        else if (btnValue === 'Clear'){
-          setCalculation(calculation.slice(0, -(display.length)));
-          setDisplay('');
-        }
-
-        setPrevBtnType('clear');
+        btnIsClear(btnValue);
         break;
-
-      // ENTER -----------------------------------------------
       case 'enter':
-        if(prevBtnType !== 'operator'){
-          let result = new Function('return ' + calculation)();
-          setDisplay(parseFloat(result.toFixed(8)).toString());
-          setCalculation(parseFloat(result.toFixed(8)).toString());
-        }
-        // Display 'Err' for incomplete calculation string
-        else {
-          setDisplay('Err');
-        }
-
-        setPrevBtnType('enter');
+        btnIsEnter(btnText);
         break;
-
-      // MEMORY ----------------------------------------------
       case 'memory':
-        if (btnValue === 'Memory Save'){
-          // stores display string to memory string & resets display
-          // memory string is not added to the calculation string
-          setMemoryStr(display);
-          setDisplay('');
-          setCalculation(calculation.slice(0, -(display.length)));
-        }
-        else if (btnValue === 'Memory Recall'){
-          setDisplay(memoryStr);
-          setCalculation(`${calculation}${memoryStr}`);
-        }
-        else if (btnValue === 'Memory Addition'){
-          if (memoryStr !== ''){
-            let result = new Function('return ' + `${memoryStr}+${display}`)();
-            setDisplay(result.toString());
-          } else {
-            // Display error if memoryStr is empty
-            setDisplay('Err. No Memory.');
-          }
-          setCalculation('');
-        }
-        else if (btnValue === 'Memory Subtract'){
-          if(memoryStr !== ''){
-            let result = new Function('return ' + `${memoryStr}-${display}`)();
-            setDisplay(result.toString());
-          }
-          else {
-            // Display error if memoryStr is empty
-            setDisplay('Err. No Memory.');
-          }
-          setCalculation('');
-        }
-        else if(btnValue === 'Memory Clear'){
-          setMemoryStr('');
-        }
-
-        setPrevBtnType('memory');
+        btnIsMemory(btnValue);
         break;
-
-      // DECIMAL ----------------------------------------------
       case 'decimal':
-        // prevents multiple decimal points in a number string
-        if(display.includes('.')){
-          setDisplay(display);
-        }
-        else {
-          // screen displays 0 on empty display state
-          // on decimal click, assume user means '0.###'
-          setCalculation(display === '' ? '0.' : `${calculation}.`);
-          setDisplay(`${display}.`);
-        }
-        setPrevBtnType('decimal');
+        btnIsDecimal();
         break;
-
-      // SIGN -------------------------------------------------
       case 'sign':
-        // check if the first character is a negative sign
-        // If it is, start string at the second character
-        if (display[0] === '-'){
-          setDisplay(display.substring(1));
-          setCalculation(display.substring(1));
-        }
-        else {
-          setDisplay(`-${display}`);
-          setCalculation(`-${display}`)
-        }
+        btnIsSign();
         break;
-
       default:
         break;
     }
-   
   }
+
+  function btnIsNumber(btnText){
+    // checks if current number input is a continuation of first or second num string to be evaluated
+    setDisplay(prevBtnType === 'operator' ? `${btnText}` : `${display}${btnText}`);
+    
+    setCalcStr(`${calcStr}${btnText}`);
+    setPrevBtnType('number');
+  }
+
+  function btnIsOperator(btnText, btnValue) {
+    // ensures operator is not followed by another operator
+    if (prevBtnType !== 'operator' && (btnText !== '%' && btnText !== '\u221a')){
+      // this ensures only the operand symbol is displayed
+      setDisplay(btnText);
+
+      // DIVIDE & MULTIPLY ------------------------------
+      // replace unicodes with JS-recognized symbols
+      if (btnText === '\u00f7'){
+        btnText = '/';
+      }
+      else if (btnText === '\u00d7'){
+        btnText = '*';
+      }
+
+      // adds recognized symbols to calc string
+      // for ALL operatots except percent and square root
+      setCalcStr(`${calcStr}${btnText}`);
+      setPrevBtnType('operator');
+    }  
+
+    // PERCENT & SQUARE ROOT --------------------------
+    // prevBtnType is not set to 'operator' in order to run 'enter' btn functionality
+    if(btnText === '%'){
+      setDisplay(btnText);
+      let strToEval = calcStr.slice(0);
+      setCalcStr(strToEval/100);
+            
+      if (btnValue === 'Enter'){
+        setDisplay(calcStr.toString());
+      }
+    }
+    else if (btnText === '\u221a'){
+      setDisplay(`${btnText}${display}`);
+      let strToEval = calcStr.slice(0);
+      setCalcStr(strToEval ** 0.05);
+            
+      if (btnValue === 'Enter'){
+        setDisplay(calcStr.toString());
+      }
+    }
+      
+  }
+    
+  function btnIsClear(btnValue) {
+    if (btnValue === 'All Clear'){
+      setDisplay('');
+      setCalcStr('');
+    }
+    else if (btnValue === 'Clear'){
+      setCalcStr(calcStr.slice(0, -(display.length)));
+      setDisplay('');
+    }
+
+    setPrevBtnType('clear');
+  }
+
+  function btnIsEnter(btnText) {
+    if(prevBtnType !== 'operator'){
+      let result = new Function('return ' + calcStr)();
+      setDisplay(parseFloat(result.toFixed(8)).toString());
+      setCalcStr(parseFloat(result.toFixed(8)).toString());
+    }
+    // Display 'Err' for incomplete calcStr string
+    else {
+      setDisplay('Err');
+    }
+
+    setPrevBtnType('enter');
+  }
+
+  function btnIsMemory(btnValue){
+    if (btnValue === 'Memory Save'){
+      // stores display string to memory string & resets display
+      // memory string is not added to the calcStr string
+      setMemoryStr(display);
+      setDisplay('');
+      setCalcStr(calcStr.slice(0, -(display.length)));
+    }
+    else if (btnValue === 'Memory Recall'){
+      setDisplay(memoryStr);
+      setCalcStr(`${calcStr}${memoryStr}`);
+    }
+    else if (btnValue === 'Memory Addition'){
+      if (memoryStr !== ''){
+        let result = new Function('return ' + `${memoryStr}+${display}`)();
+        setDisplay(result.toString());
+      } else {
+        // Display error if memoryStr is empty
+        setDisplay('Err. No Memory.');
+      }
+      setCalcStr('');
+    }
+    else if (btnValue === 'Memory Subtract'){
+      if(memoryStr !== ''){
+        let result = new Function('return ' + `${memoryStr}-${display}`)();
+        setDisplay(result.toString());
+      }
+      else {
+        // Display error if memoryStr is empty
+        setDisplay('Err. No Memory.');
+      }
+      setCalcStr('');
+    }
+    else if(btnValue === 'Memory Clear'){
+      setMemoryStr('');
+    }
+
+    setPrevBtnType('memory');
+  }
+
+  function btnIsDecimal(){
+    // prevents multiple decimal points in a number string
+    if(display.includes('.')){
+      setDisplay(display);
+    }
+    else {
+      // screen displays 0 on empty display state
+      // on decimal click, assume user means '0.###'
+      setCalcStr(display === '' ? '0.' : `${calcStr}.`);
+      setDisplay(display === '' ? '0.' : `${display}.`);
+    }
+
+    setPrevBtnType('decimal');
+  }
+
+  function btnIsSign(){
+    // check if the first character is a negative sign
+    // If it is, start string at the second character
+    if (display[0] === '-'){
+      setDisplay(display.substring(1));
+      setCalcStr(display.substring(1));
+    }
+    else {
+      setDisplay(`-${display}`);
+      setCalcStr(`-${display}`)
+    }
+  }
+  
 
   // ------------------------------------------------------------------
 
@@ -191,11 +215,11 @@ function App() {
         /> )}
         </div>
       </div>
+      <NotesForUse /> 
 
       <Footer />
     </div>
   );
-  
 }
 
 export default App;

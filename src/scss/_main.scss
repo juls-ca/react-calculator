@@ -1,11 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap');
 
 body {
-    background: #3E5151;  /* fallback for old browsers */
-    background: -webkit-linear-gradient(to bottom, #3E5151,  #DECBA4);  /* Chrome 10-25, Safari 5.1-6 */
-    background: linear-gradient(to bottom, #3E5151, #DECBA4); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */    
-    background-repeat: no-repeat;
-    background-size: cover;
+   
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -18,7 +14,12 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
+    background: #3E5151;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to bottom, #3E5151,  #DECBA4);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to bottom, #3E5151, #DECBA4); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */    
+    background-repeat: no-repeat;
+    background-size: cover;
 
     h1 {
         font-size: 3rem;

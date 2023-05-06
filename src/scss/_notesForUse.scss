@@ -1,0 +1,29 @@
+.accordion {
+  width: 70%;
+  margin: 2rem auto;
+}
+
+.accordion-btn {
+  background-color: transparent;
+  color: #ffffff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: left;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  outline: none;
+  padding-bottom: 1rem;
+  cursor: pointer;
+}
+
+.accordion-content {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease-out;
+}
+
+.accordion-content.active {
+  max-height: 50rem;
+}
